@@ -1,0 +1,55 @@
+{
+  "name": "@edwise/unified-report-generator",
+  "version": "1.0.0",
+  "description": "A unified performance report generator that combines JMeter, Playwright, and Azure metrics into a single dashboard",
+  "main": "index.js",
+  "type": "module",
+  "bin": {
+    "unified-report": "./bin/cli.js"
+  },
+  "exports": {
+    ".": "./index.js",
+    "./config": "./src/config/defaultConfig.js"
+  },
+  "files": [
+    "bin/",
+    "src/",
+    "index.js",
+    "config.example.js",
+    "README.md",
+    "package.json"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepublishOnly": "npm test"
+  },
+  "keywords": [
+    "performance",
+    "testing",
+    "jmeter",
+    "playwright",
+    "azure",
+    "report",
+    "dashboard",
+    "load-testing",
+    "performance-testing",
+    "metrics",
+    "analytics"
+  ],
+  "author": "Edwise",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SachinSuresh010/unified-report-generator.git"
+  },
+  "bugs": {
+    "url": "https://github.com/SachinSuresh010/unified-report-generator/issues"
+  },
+  "homepage": "https://github.com/SachinSuresh010/unified-report-generator#readme",
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

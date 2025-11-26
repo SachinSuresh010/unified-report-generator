@@ -1,0 +1,38 @@
+# Test directories
+test-*/
+
+# Internal documentation
+COMPLETE_IMPLEMENTATION.md
+REFACTORING_NOTES.md
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.iml
+
+# Git
+.git/
+.gitignore
+
+# Logs
+*.log
+npm-debug.log*
+
+# Environment files
+.env
+.env.local
+
+# Config files with sensitive data (keep config.example.js)
+config.js
+
+# Coverage
+coverage/
+.nyc_output/
+
+# Temporary files
+tmp/
+temp/
