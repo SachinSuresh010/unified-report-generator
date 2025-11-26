@@ -109,6 +109,9 @@ export async function loadConfiguration(configPath = null) {
 function deepMerge(target, source) {
   const output = { ...target };
   
+  // Arrays that should be replaced entirely (not merged)
+  const replaceArrays = ['userTypes', 'appComponents', 'jmxThreadGroupNames', 'threadGroupPatterns', 'fallbackModels'];
+  
   if (isObject(target) && isObject(source)) {
     Object.keys(source).forEach((key) => {
       if (isObject(source[key])) {
@@ -118,9 +121,13 @@ function deepMerge(target, source) {
           output[key] = deepMerge(target[key], source[key]);
         }
       } else if (Array.isArray(source[key])) {
-        output[key] = Array.isArray(target[key]) 
-          ? [...target[key], ...source[key]] 
-          : source[key];
+        // Replace arrays entirely if they're in the replace list, or if target doesn't have this key
+        if (replaceArrays.includes(key) || !Array.isArray(target[key])) {
+          output[key] = source[key];
+        } else {
+          // For other arrays, concatenate (though most should be replaced)
+          output[key] = source[key];
+        }
       } else {
         Object.assign(output, { [key]: source[key] });
       }
