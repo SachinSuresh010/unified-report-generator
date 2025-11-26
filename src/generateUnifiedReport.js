@@ -1753,9 +1753,12 @@ async function getAzureLoadTestInfo(azureDir, config, artifactsDir) {
                 console.warn(`   ⚠️  Error fetching Azure metrics: ${error.message}`);
                 console.warn('   💡 Tip: Run "az login" to authenticate with Azure');
             }
-        } else if (config.azure && config.azure.subscriptionId && config.azure.loadTestDataPlaneUri) {
-            // No testRunId found, but Azure config exists - try to fetch latest test run
-            console.log('   📡 No testRunId found. Attempting to fetch latest test run from Azure...');
+        }
+        
+        // Try to fetch latest test run if no metrics file and no testRunId
+        if (!serverMetrics && config.azure && config.azure.subscriptionId && config.azure.loadTestDataPlaneUri) {
+                // No testRunId found, but Azure config exists - try to fetch latest test run
+                console.log('   📡 No testRunId found. Attempting to fetch latest test run from Azure...');
             try {
                 // Ensure directory exists
                 if (!fs.existsSync(actualAzureDir)) {
@@ -1786,6 +1789,7 @@ async function getAzureLoadTestInfo(azureDir, config, artifactsDir) {
             } catch (error) {
                 console.warn(`   ⚠️  Error fetching Azure metrics: ${error.message}`);
                 console.warn('   💡 Tip: Run "az login" to authenticate with Azure');
+            }
             }
         }
 
