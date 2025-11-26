@@ -1757,8 +1757,8 @@ async function getAzureLoadTestInfo(azureDir, config, artifactsDir) {
         
         // Try to fetch latest test run if no metrics file and no testRunId
         if (!serverMetrics && config.azure && config.azure.subscriptionId && config.azure.loadTestDataPlaneUri) {
-                // No testRunId found, but Azure config exists - try to fetch latest test run
-                console.log('   📡 No testRunId found. Attempting to fetch latest test run from Azure...');
+            // No testRunId found, but Azure config exists - try to fetch latest test run
+            console.log('   📡 No testRunId found. Attempting to fetch latest test run from Azure...');
             try {
                 // Ensure directory exists
                 if (!fs.existsSync(actualAzureDir)) {
