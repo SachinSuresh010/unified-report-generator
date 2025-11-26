@@ -25,6 +25,10 @@ export default {
     loadTestResource: process.env.AZURE_LOAD_TEST_RESOURCE || '',
     loadTestDataPlaneUri: process.env.AZURE_LOAD_TEST_DATA_PLANE_URI || '',
     apiVersion: '2024-12-01-preview',
+    // Optional: Azure Load Test run ID to fetch metrics for (if not found in artifacts)
+    // If provided, metrics will be fetched dynamically from Azure API
+    // If not provided, the tool will try to extract it from artifacts
+    testRunId: null,  // e.g., '99c67ad2-b598-46fe-a413-9890b4b78d54'
     // Array of Azure resources to monitor
     appComponents: [
       {

@@ -16,6 +16,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import { generateAIAnalysis } from './generateAIAnalysis.js';
+import { fetchAzureMetrics } from './fetchAzureMetrics.js';
 
 // Get current file path for ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -80,7 +81,7 @@ export async function generateUnifiedReport(options = {}) {
 
         // Step 4: Get Azure Load Test info
         console.log('☁️  Processing Azure Load Test info...');
-        const azureData = getAzureLoadTestInfo(azureDir, config, baseArtifactsDir);
+        const azureData = await getAzureLoadTestInfo(azureDir, config, baseArtifactsDir);
 
         // Step 5: Generate section summaries
         console.log('📝 Generating section summaries...');
@@ -168,7 +169,7 @@ export async function generateStandaloneUnifiedReport(options = {}) {
         }
 
         console.log('☁️  Processing Azure Load Test info...');
-        const azureData = getAzureLoadTestInfo(azureDir, config, baseArtifactsDir);
+        const azureData = await getAzureLoadTestInfo(azureDir, config, baseArtifactsDir);
 
         // Step 3: Generate AI analysis (only if enabled)
         let aiAnalysis = null;
@@ -1524,7 +1525,7 @@ function parsePlaywrightResults(artifactsDir, outputDir, config) {
     }
 }
 
-function getAzureLoadTestInfo(azureDir, config, artifactsDir) {
+async function getAzureLoadTestInfo(azureDir, config, artifactsDir) {
     try {
         // Get Azure data path from config
         const azureDataPath = config.paths?.azureDataPath || 'unified-report/azure';
@@ -1674,7 +1675,7 @@ function getAzureLoadTestInfo(azureDir, config, artifactsDir) {
         const azureDashboardPath = path.join(actualAzureDir, 'dashboard', 'index.html');
         const hasAzureDashboard = fs.existsSync(azureDashboardPath);
 
-        // Read server-side metrics JSON if available
+        // Read server-side metrics JSON if available, or fetch dynamically
         let serverMetrics = null;
         const metricsFile = path.join(actualAzureDir, 'azure-server-metrics.json');
         if (fs.existsSync(metricsFile)) {
@@ -1693,6 +1694,64 @@ function getAzureLoadTestInfo(azureDir, config, artifactsDir) {
                 // Do NOT overwrite with server-side metrics!
             } catch (e) {
                 console.warn('   ⚠️  Could not parse server metrics JSON:', e.message);
+            }
+        } else if (testRunId && config.azure) {
+            // Metrics file doesn't exist, but we have testRunId - try to fetch dynamically
+            console.log('   📡 Server-side metrics not found. Attempting to fetch from Azure...');
+            try {
+                // Ensure directory exists
+                if (!fs.existsSync(actualAzureDir)) {
+                    fs.mkdirSync(actualAzureDir, { recursive: true });
+                }
+                
+                const fetchedMetrics = await fetchAzureMetrics(testRunId, config);
+                if (fetchedMetrics) {
+                    serverMetrics = fetchedMetrics;
+                    // Save fetched metrics to file for future use
+                    fs.writeFileSync(metricsFile, JSON.stringify(fetchedMetrics, null, 2));
+                    console.log('   ✅ Server-side metrics fetched and saved to azure-server-metrics.json');
+
+                    // Update CPU and Memory values from App Service Plan metrics if available
+                    if (serverMetrics?.serverMetrics?.appServicePlan) {
+                        avgCpuPercent = serverMetrics.serverMetrics.appServicePlan.cpuPercentage?.avg || avgCpuPercent;
+                        avgMemoryPercent = serverMetrics.serverMetrics.appServicePlan.memoryPercentage?.avg || avgMemoryPercent;
+                    }
+                } else {
+                    console.warn('   ⚠️  Could not fetch metrics from Azure. Make sure you are authenticated (run: az login)');
+                }
+            } catch (error) {
+                console.warn(`   ⚠️  Error fetching Azure metrics: ${error.message}`);
+                console.warn('   💡 Tip: Run "az login" to authenticate with Azure');
+            }
+        } else if (config.azure?.testRunId) {
+            // Use testRunId from config if not found in artifacts
+            testRunId = config.azure.testRunId;
+            console.log(`   Using testRunId from config: ${testRunId}`);
+            console.log('   📡 Attempting to fetch metrics from Azure...');
+            try {
+                // Ensure directory exists
+                if (!fs.existsSync(actualAzureDir)) {
+                    fs.mkdirSync(actualAzureDir, { recursive: true });
+                }
+                
+                const fetchedMetrics = await fetchAzureMetrics(testRunId, config);
+                if (fetchedMetrics) {
+                    serverMetrics = fetchedMetrics;
+                    // Save fetched metrics to file for future use
+                    fs.writeFileSync(metricsFile, JSON.stringify(fetchedMetrics, null, 2));
+                    console.log('   ✅ Server-side metrics fetched and saved to azure-server-metrics.json');
+
+                    // Update CPU and Memory values from App Service Plan metrics if available
+                    if (serverMetrics?.serverMetrics?.appServicePlan) {
+                        avgCpuPercent = serverMetrics.serverMetrics.appServicePlan.cpuPercentage?.avg || avgCpuPercent;
+                        avgMemoryPercent = serverMetrics.serverMetrics.appServicePlan.memoryPercentage?.avg || avgMemoryPercent;
+                    }
+                } else {
+                    console.warn('   ⚠️  Could not fetch metrics from Azure. Make sure you are authenticated (run: az login)');
+                }
+            } catch (error) {
+                console.warn(`   ⚠️  Error fetching Azure metrics: ${error.message}`);
+                console.warn('   💡 Tip: Run "az login" to authenticate with Azure');
             }
         }
 
