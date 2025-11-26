@@ -1,6 +1,6 @@
 /**
  * Example Configuration File for Unified Report Generator
- * 
+ *
  * Copy this file to config.js and update with your settings.
  * Make sure to add config.js to .gitignore to keep sensitive data secure.
  */
@@ -81,7 +81,7 @@ export default {
   // Can be relative to current working directory or absolute path
   // CLI --output flag will override this setting
   outputDir: '.artifacts/unified-report',  // Default: .artifacts/unified-report
-  
+
   // Paths configuration - all paths are relative to artifactsDir unless absolute
   // You can customize these if your test data is stored in different locations
   paths: {
@@ -91,19 +91,19 @@ export default {
     // Alternative locations to check if jmeterCsvPath doesn't exist
     // The package will try these in order until it finds CSV files
     jmeterCsvAlternatives: ['unified-report/jmeter', 'jmeter'],
-    
+
     // Playwright UI report path (relative to artifactsDir or absolute)
     // Path to the main Playwright HTML report (index.html)
     playwrightReportPath: 'playwright-report',  // Default: artifactsDir/playwright-report/
-    
+
     // Playwright performance reports path (relative to artifactsDir or absolute)
     // Path to performance-specific reports
     playwrightPerformanceReportsPath: 'performance-reports',  // Default: artifactsDir/performance-reports/
-    
+
     // Playwright consolidated reports path (relative to artifactsDir or absolute)
     // Path to consolidated/aggregated Playwright reports
     playwrightConsolidatedReportsPath: 'unified-report/playwright-reports',  // Default: artifactsDir/unified-report/playwright-reports/
-    
+
     // Azure Load Test data path (relative to artifactsDir or absolute)
     // The package will look for Azure data (CSV, dashboard, metrics JSON) in this directory
     azureDataPath: 'unified-report/azure',  // Default: artifactsDir/unified-report/azure/

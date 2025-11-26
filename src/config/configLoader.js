@@ -6,7 +6,7 @@
 
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
 import { defaultConfig } from './defaultConfig.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -20,29 +20,58 @@ const __dirname = path.dirname(__filename);
 export async function loadConfiguration(configPath = null) {
   let userConfig = {};
 
+  // Helper function to safely resolve and import config
+  async function loadConfigFile(filePath) {
+    try {
+      // Resolve path - handle both absolute and relative paths
+      const resolvedPath = path.isAbsolute(filePath) ? filePath : path.resolve(process.cwd(), filePath);
+      
+      // Check if file exists
+      if (!fs.existsSync(resolvedPath)) {
+        return null;
+      }
+      
+      // Use file:// URL for proper path handling (especially with spaces)
+      // pathToFileURL automatically handles URL encoding
+      const fileUrl = pathToFileURL(resolvedPath).href;
+      const configModule = await import(fileUrl);
+      return configModule.default || configModule;
+    } catch (error) {
+      // If file:// URL import fails, try direct import as fallback
+      try {
+        const resolvedPath = path.isAbsolute(filePath) ? filePath : path.resolve(process.cwd(), filePath);
+        const configModule = await import(resolvedPath);
+        return configModule.default || configModule;
+      } catch (fallbackError) {
+        throw error; // Throw original error
+      }
+    }
+  }
+
   // Try to find config file
   if (configPath) {
-    // Use provided path
-    if (fs.existsSync(configPath)) {
-      try {
-        const configModule = await import(path.resolve(configPath));
-        userConfig = configModule.default || configModule;
-      } catch (error) {
-        console.warn(`⚠️  Error loading config from ${configPath}:`, error.message);
+    try {
+      const loaded = await loadConfigFile(configPath);
+      if (loaded) {
+        userConfig = loaded;
+        console.log(`   ✓ Configuration loaded from: ${configPath}`);
+      } else {
+        console.warn(`⚠️  Config file not found: ${configPath}`);
       }
-    } else {
-      console.warn(`⚠️  Config file not found: ${configPath}`);
+    } catch (error) {
+      console.warn(`⚠️  Error loading config from ${configPath}:`, error.message);
     }
   } else {
     // Try to find config.js in current working directory
     const cwdConfigPath = path.join(process.cwd(), 'config.js');
-    if (fs.existsSync(cwdConfigPath)) {
-      try {
-        const configModule = await import(cwdConfigPath);
-        userConfig = configModule.default || configModule;
-      } catch (error) {
-        console.warn(`⚠️  Error loading config from ${cwdConfigPath}:`, error.message);
+    try {
+      const loaded = await loadConfigFile(cwdConfigPath);
+      if (loaded) {
+        userConfig = loaded;
+        console.log(`   ✓ Configuration loaded from: config.js`);
       }
+    } catch (error) {
+      // Silent fail - will use defaults
     }
   }
 
