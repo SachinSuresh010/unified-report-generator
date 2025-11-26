@@ -1753,6 +1753,40 @@ async function getAzureLoadTestInfo(azureDir, config, artifactsDir) {
                 console.warn(`   ⚠️  Error fetching Azure metrics: ${error.message}`);
                 console.warn('   💡 Tip: Run "az login" to authenticate with Azure');
             }
+        } else if (config.azure && config.azure.subscriptionId && config.azure.loadTestDataPlaneUri) {
+            // No testRunId found, but Azure config exists - try to fetch latest test run
+            console.log('   📡 No testRunId found. Attempting to fetch latest test run from Azure...');
+            try {
+                // Ensure directory exists
+                if (!fs.existsSync(actualAzureDir)) {
+                    fs.mkdirSync(actualAzureDir, { recursive: true });
+                }
+                
+                // Pass null to fetchAzureMetrics to trigger latest test run lookup
+                const fetchedMetrics = await fetchAzureMetrics(null, config);
+                if (fetchedMetrics) {
+                    serverMetrics = fetchedMetrics;
+                    // Extract testRunId from fetched metrics
+                    if (fetchedMetrics.testRunId) {
+                        testRunId = fetchedMetrics.testRunId;
+                    }
+                    // Save fetched metrics to file for future use
+                    fs.writeFileSync(metricsFile, JSON.stringify(fetchedMetrics, null, 2));
+                    console.log('   ✅ Server-side metrics fetched and saved to azure-server-metrics.json');
+
+                    // Update CPU and Memory values from App Service Plan metrics if available
+                    if (serverMetrics?.serverMetrics?.appServicePlan) {
+                        avgCpuPercent = serverMetrics.serverMetrics.appServicePlan.cpuPercentage?.avg || avgCpuPercent;
+                        avgMemoryPercent = serverMetrics.serverMetrics.appServicePlan.memoryPercentage?.avg || avgMemoryPercent;
+                    }
+                } else {
+                    console.warn('   ⚠️  Could not fetch metrics from Azure.');
+                    console.warn('   💡 Tip: Provide testRunId in config.azure.testRunId or ensure you have test runs in Azure');
+                }
+            } catch (error) {
+                console.warn(`   ⚠️  Error fetching Azure metrics: ${error.message}`);
+                console.warn('   💡 Tip: Run "az login" to authenticate with Azure');
+            }
         }
 
         console.log(`   Azure Load Test results: ${hasResults ? 'Found' : 'Not found'}`);

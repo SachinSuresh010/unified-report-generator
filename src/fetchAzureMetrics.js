@@ -80,6 +80,16 @@ async function azureRequest(url, accessToken) {
 }
 
 /**
+ * List test runs from Azure Load Testing (using data plane API)
+ */
+async function listTestRuns(dataPlaneUri, accessToken, limit = 10) {
+    const dataPlaneUrl = `https://${dataPlaneUri}/test-runs?api-version=2024-05-01-preview&maxPageSize=${limit}`;
+
+    console.log('Fetching list of test runs...');
+    return await azureRequest(dataPlaneUrl, accessToken);
+}
+
+/**
  * Get test run details from Azure Load Testing (using data plane API)
  */
 async function getTestRunDetails(testRunId, dataPlaneUri, accessToken) {
@@ -292,6 +302,29 @@ export async function fetchAzureMetrics(testRunId, config) {
     console.log('✅ Authenticated successfully\n');
 
     try {
+        // If testRunId is not provided, try to get the latest test run
+        if (!testRunId) {
+            console.log('📋 No testRunId provided. Fetching latest test run...\n');
+            try {
+                const testRunsResponse = await listTestRuns(azureConfig.loadTestDataPlaneUri, loadTestToken, 1);
+                // The API might return an array or an object with a value property
+                const testRuns = Array.isArray(testRunsResponse) ? testRunsResponse : (testRunsResponse.value || []);
+                
+                if (testRuns.length > 0) {
+                    // Get the first (latest) test run
+                    testRunId = testRuns[0].testRunId || testRuns[0].id;
+                    console.log(`✅ Found latest test run: ${testRunId}\n`);
+                } else {
+                    console.error('❌ No test runs found in Azure Load Testing');
+                    return null;
+                }
+            } catch (error) {
+                console.error(`❌ Failed to list test runs: ${error.message}`);
+                console.log('💡 Tip: Provide testRunId in config.azure.testRunId or ensure you have test runs in Azure');
+                return null;
+            }
+        }
+
         // Get test run details
         const testRunDetails = await getTestRunDetails(testRunId, azureConfig.loadTestDataPlaneUri, loadTestToken);
         console.log(`✅ Test run details retrieved: ${testRunDetails.status || 'Unknown'}\n`);
