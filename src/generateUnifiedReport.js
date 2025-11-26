@@ -1790,7 +1790,6 @@ async function getAzureLoadTestInfo(azureDir, config, artifactsDir) {
                 console.warn(`   ⚠️  Error fetching Azure metrics: ${error.message}`);
                 console.warn('   💡 Tip: Run "az login" to authenticate with Azure');
             }
-            }
         }
 
         console.log(`   Azure Load Test results: ${hasResults ? 'Found' : 'Not found'}`);
