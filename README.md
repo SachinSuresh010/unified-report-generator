@@ -13,13 +13,13 @@ A unified performance report generator that combines JMeter load test results, P
 ## Installation
 
 ```bash
-npm install @edwise/unified-report-generator
+npm install unified-report-generator
 ```
 
 ### From GitHub (development)
 
 ```bash
-npm install git+https://github.com/YOUR_USERNAME/unified-report-generator.git
+npm install git+https://github.com/SachinSuresh010/unified-report-generator.git
 ```
 
 ### From Local Package
@@ -63,7 +63,7 @@ export default {
 unified-report
 
 # Or using Node.js
-import { generateUnifiedReport } from '@edwise/unified-report-generator';
+import { generateUnifiedReport } from 'unified-report-generator';
 await generateUnifiedReport({ config });
 ```
 
@@ -142,7 +142,7 @@ unified-report  # Will use ./reports from config
 ## Programmatic Usage
 
 ```javascript
-import { generateUnifiedReport, generateStandaloneUnifiedReport, loadConfiguration } from '@edwise/unified-report-generator';
+import { generateUnifiedReport, generateStandaloneUnifiedReport, loadConfiguration } from 'unified-report-generator';
 
 // Load configuration
 const config = await loadConfiguration('./config.js');
