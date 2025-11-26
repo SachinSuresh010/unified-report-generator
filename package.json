@@ -1,6 +1,6 @@
 {
   "name": "unified-report-generator",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A unified performance report generator that combines JMeter, Playwright, and Azure metrics into a single dashboard",
   "main": "index.js",
   "type": "module",
