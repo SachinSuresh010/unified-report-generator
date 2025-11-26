@@ -6,6 +6,10 @@
  * Command-line interface for generating unified performance reports
  */
 
+// Load environment variables from .env file FIRST, before any other imports
+import dotenv from 'dotenv';
+dotenv.config();
+
 import { generateUnifiedReport, generateStandaloneUnifiedReport } from '../src/generateUnifiedReport.js';
 import { loadConfiguration } from '../src/config/configLoader.js';
 import path from 'path';
