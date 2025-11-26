@@ -1740,6 +1740,17 @@ async function getAzureLoadTestInfo(azureDir, config, artifactsDir) {
                 const fetchedMetrics = await fetchAzureMetrics(testRunId, config);
                 if (fetchedMetrics) {
                     serverMetrics = fetchedMetrics;
+                    // Update testRunId if it was extracted from fetched metrics
+                    if (fetchedMetrics.testRunId) {
+                        testRunId = fetchedMetrics.testRunId;
+                    }
+                    // Update portal URL with testRunId
+                    if (testRunId && config.azure && config.azure.subscriptionId && config.azure.resourceGroup && config.azure.loadTestResource) {
+                        const subscriptionId = encodeURIComponent(config.azure.subscriptionId);
+                        const resourceGroup = encodeURIComponent(config.azure.resourceGroup);
+                        const loadTestResource = encodeURIComponent(config.azure.loadTestResource);
+                        portalUrl = `https://portal.azure.com/#view/Microsoft_Azure_CloudNativeTesting/TestRunReport.ReactView/resourceId/%2Fsubscriptions%2F${subscriptionId}%2Fresourcegroups%2F${resourceGroup}%2Fproviders%2Fmicrosoft.loadtestservice%2Floadtests%2F${loadTestResource}/testRunId/${testRunId}`;
+                    }
                     // Save fetched metrics to file for future use
                     fs.writeFileSync(metricsFile, JSON.stringify(fetchedMetrics, null, 2));
                     console.log('   ✅ Server-side metrics fetched and saved to azure-server-metrics.json');
@@ -1775,13 +1786,13 @@ async function getAzureLoadTestInfo(azureDir, config, artifactsDir) {
                     // Extract testRunId from fetched metrics
                     if (fetchedMetrics.testRunId) {
                         testRunId = fetchedMetrics.testRunId;
-                        // Update portal URL with the fetched testRunId
-                        if (config.azure && config.azure.subscriptionId && config.azure.resourceGroup && config.azure.loadTestResource) {
-                            const subscriptionId = encodeURIComponent(config.azure.subscriptionId);
-                            const resourceGroup = encodeURIComponent(config.azure.resourceGroup);
-                            const loadTestResource = encodeURIComponent(config.azure.loadTestResource);
-                            portalUrl = `https://portal.azure.com/#view/Microsoft_Azure_CloudNativeTesting/TestRunReport.ReactView/resourceId/%2Fsubscriptions%2F${subscriptionId}%2Fresourcegroups%2F${resourceGroup}%2Fproviders%2Fmicrosoft.loadtestservice%2Floadtests%2F${loadTestResource}/testRunId/${testRunId}`;
-                        }
+                    }
+                    // Update portal URL with the fetched testRunId (do this after testRunId is set)
+                    if (testRunId && config.azure && config.azure.subscriptionId && config.azure.resourceGroup && config.azure.loadTestResource) {
+                        const subscriptionId = encodeURIComponent(config.azure.subscriptionId);
+                        const resourceGroup = encodeURIComponent(config.azure.resourceGroup);
+                        const loadTestResource = encodeURIComponent(config.azure.loadTestResource);
+                        portalUrl = `https://portal.azure.com/#view/Microsoft_Azure_CloudNativeTesting/TestRunReport.ReactView/resourceId/%2Fsubscriptions%2F${subscriptionId}%2Fresourcegroups%2F${resourceGroup}%2Fproviders%2Fmicrosoft.loadtestservice%2Floadtests%2F${loadTestResource}/testRunId/${testRunId}`;
                     }
                     // Save fetched metrics to file for future use
                     fs.writeFileSync(metricsFile, JSON.stringify(fetchedMetrics, null, 2));
