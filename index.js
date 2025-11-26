@@ -1,7 +1,7 @@
 /**
  * Unified Report Generator - Main Entry Point
  * 
- * @module @edwise/unified-report-generator
+ * @module unified-report-generator
  */
 
 export { generateUnifiedReport, generateStandaloneUnifiedReport } from './src/generateUnifiedReport.js';

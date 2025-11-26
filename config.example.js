@@ -42,27 +42,34 @@ export default {
   },
   // JMeter configuration
   jmxFile: {
-    path: 'PerformanceTesting/SCDE-Flow.jmx',  // Path relative to project root, or null to disable
+    path: 'path/to/your/test-plan.jmx',  // Path relative to project root, or null to disable
   },
   // User type configuration for JMeter analysis
+  // Customize these to match your application's user roles
   userTypes: [
     {
-      key: 'districtCoordinators',
-      displayName: 'District Coordinators',
-      threadGroupPatterns: ['District Coordinator'],
+      key: 'userType1',
+      displayName: 'User Type 1',
+      threadGroupPatterns: ['User Type 1'],
       jmxThreadGroupNames: [],
     },
     {
-      key: 'schoolUsers',
-      displayName: 'School Users',
-      threadGroupPatterns: ['School User'],
+      key: 'userType2',
+      displayName: 'User Type 2',
+      threadGroupPatterns: ['User Type 2'],
+      jmxThreadGroupNames: [],
+    },
+    {
+      key: 'adminUsers',
+      displayName: 'Admin Users',
+      threadGroupPatterns: ['Admin', 'Administrator'],
       jmxThreadGroupNames: [],
     },
     // Add more user types as needed
   ],
   // Environment configuration
   environment: {
-    urlPattern: 'app-gifted-(?:ui-)?(\\w+)\\.azurewebsites\\.net',
+    urlPattern: 'app-(?:ui-)?(\\w+)\\.azurewebsites\\.net',  // Generic Azure App Service URL pattern - customize for your environment
   },
   // Thread counting configuration
   threadCounting: {

@@ -788,7 +788,7 @@ function extractUserConfiguration(allSamples, threadGroupMap = null, reportConfi
     }
 
     // Extract environment from URLs using configured pattern
-    const urlPattern = reportConfig?.environment?.urlPattern || 'app-gifted-(?:ui-)?(\\w+)\\.azurewebsites\\.net';
+        const urlPattern = reportConfig?.environment?.urlPattern || 'app-(?:ui-)?(\\w+)\\.azurewebsites\\.net';
     const envRegex = new RegExp(urlPattern);
 
     for (const sample of allSamples) {

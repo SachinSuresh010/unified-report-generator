@@ -25,32 +25,32 @@ const defaultConfig = {
   },
   userTypes: [
     {
-      key: 'districtCoordinators',
-      displayName: 'District Coordinators',
-      threadGroupPatterns: ['District Coordinator'],
+      key: 'userType1',
+      displayName: 'User Type 1',
+      threadGroupPatterns: ['User Type 1'],
       jmxThreadGroupNames: [],
     },
     {
-      key: 'schoolUsers',
-      displayName: 'School Users',
-      threadGroupPatterns: ['School User'],
+      key: 'userType2',
+      displayName: 'User Type 2',
+      threadGroupPatterns: ['User Type 2'],
       jmxThreadGroupNames: [],
     },
     {
-      key: 'gtAdmins',
-      displayName: 'GT Admins',
-      threadGroupPatterns: ['GT Admin', 'District GT Admin'],
+      key: 'adminUsers',
+      displayName: 'Admin Users',
+      threadGroupPatterns: ['Admin', 'Administrator'],
       jmxThreadGroupNames: [],
     },
     {
-      key: 'stateAdmins',
-      displayName: 'State Admins',
-      threadGroupPatterns: ['State Admin', 'SEA'],
+      key: 'powerUsers',
+      displayName: 'Power Users',
+      threadGroupPatterns: ['Power User', 'Advanced User'],
       jmxThreadGroupNames: [],
     },
   ],
   environment: {
-    urlPattern: 'app-gifted-(?:ui-)?(\\w+)\\.azurewebsites\\.net',
+    urlPattern: 'app-(?:ui-)?(\\w+)\\.azurewebsites\\.net',  // Generic Azure App Service URL pattern
   },
   threadCounting: {
     rampUpWindowMs: 10000,
