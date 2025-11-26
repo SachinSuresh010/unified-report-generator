@@ -1662,13 +1662,16 @@ async function getAzureLoadTestInfo(azureDir, config, artifactsDir) {
             }
         }
 
-        // Build portal URL with testRunId if available
+        // Build portal URL - always use TestRunReport if we have testRunId, otherwise use basePortalUrl
         let portalUrl = basePortalUrl;
         if (testRunId && config.azure && config.azure.subscriptionId && config.azure.resourceGroup && config.azure.loadTestResource) {
             const subscriptionId = encodeURIComponent(config.azure.subscriptionId);
             const resourceGroup = encodeURIComponent(config.azure.resourceGroup);
             const loadTestResource = encodeURIComponent(config.azure.loadTestResource);
             portalUrl = `https://portal.azure.com/#view/Microsoft_Azure_CloudNativeTesting/TestRunReport.ReactView/resourceId/%2Fsubscriptions%2F${subscriptionId}%2Fresourcegroups%2F${resourceGroup}%2Fproviders%2Fmicrosoft.loadtestservice%2Floadtests%2F${loadTestResource}/testRunId/${testRunId}`;
+        } else if (basePortalUrl) {
+            // If no testRunId but we have base config, use NewTestRun view
+            portalUrl = basePortalUrl;
         }
 
         // Check if Azure dashboard exists (index.html from report.zip in dashboard folder)
@@ -1772,6 +1775,13 @@ async function getAzureLoadTestInfo(azureDir, config, artifactsDir) {
                     // Extract testRunId from fetched metrics
                     if (fetchedMetrics.testRunId) {
                         testRunId = fetchedMetrics.testRunId;
+                        // Update portal URL with the fetched testRunId
+                        if (config.azure && config.azure.subscriptionId && config.azure.resourceGroup && config.azure.loadTestResource) {
+                            const subscriptionId = encodeURIComponent(config.azure.subscriptionId);
+                            const resourceGroup = encodeURIComponent(config.azure.resourceGroup);
+                            const loadTestResource = encodeURIComponent(config.azure.loadTestResource);
+                            portalUrl = `https://portal.azure.com/#view/Microsoft_Azure_CloudNativeTesting/TestRunReport.ReactView/resourceId/%2Fsubscriptions%2F${subscriptionId}%2Fresourcegroups%2F${resourceGroup}%2Fproviders%2Fmicrosoft.loadtestservice%2Floadtests%2F${loadTestResource}/testRunId/${testRunId}`;
+                        }
                     }
                     // Save fetched metrics to file for future use
                     fs.writeFileSync(metricsFile, JSON.stringify(fetchedMetrics, null, 2));
