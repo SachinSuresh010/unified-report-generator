@@ -37,11 +37,13 @@ cp config.example.js config.js
 # Or create a new config.js file manually
 ```
 
-**Important**: Add `config.js` to your `.gitignore` file to prevent committing sensitive data:
+**Important**: If your `config.js` contains hardcoded sensitive values (API keys, credentials), add it to `.gitignore`:
 
 ```bash
 echo "config.js" >> .gitignore
 ```
+
+**For CI/CD pipelines**: If your `config.js` only uses environment variables (like the example above), you can safely commit it. Your pipeline should inject environment variables at runtime.
 
 ### Step 3: Set Up Environment Variables (Recommended)
 
@@ -56,11 +58,13 @@ AZURE_LOAD_TEST_RESOURCE=your_load_test_resource
 AZURE_LOAD_TEST_DATA_PLANE_URI=your_data_plane_uri
 ```
 
-**Security**: Add `.env` to your `.gitignore` as well:
+**Security**: Always add `.env` to your `.gitignore` (it should never be committed):
 
 ```bash
 echo ".env" >> .gitignore
 ```
+
+**Note**: The `.env` file is for local development only. In CI/CD pipelines, use your pipeline's environment variables/secrets management instead.
 
 The package automatically loads environment variables from `.env` files using `dotenv`.
 
@@ -310,15 +314,17 @@ The generator creates the following structure:
 
 ## Security Best Practices
 
-1. **Never commit `config.js`** - Add it to `.gitignore`
-2. **Use environment variables** for sensitive data:
+1. **Commit `config.js` if it only uses environment variables** - Safe to commit when using `process.env.*` patterns
+2. **Don't commit `config.js` if it contains hardcoded secrets** - Add to `.gitignore` if you have hardcoded API keys or credentials
+3. **Use environment variables** for sensitive data:
    ```javascript
    apiKey: process.env.GEMINI_API_KEY || '',
    subscriptionId: process.env.AZURE_SUBSCRIPTION_ID || '',
    ```
-3. **Use `config.example.js`** as a template without real values
-4. **Rotate credentials** regularly
-5. **Limit access** to configuration files
+4. **For CI/CD pipelines**: Commit `config.js` with environment variable references, then inject actual values via pipeline environment variables or secrets
+5. **Use `config.example.js`** as a template for documentation
+6. **Rotate credentials** regularly
+7. **Limit access** to environment variables and secrets in your pipeline/CI system
 
 ## Environment Variables
 
