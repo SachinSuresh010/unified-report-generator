@@ -16,20 +16,6 @@ A unified performance report generator that combines JMeter load test results, P
 npm install unified-report-generator
 ```
 
-### From GitHub (development)
-
-```bash
-npm install git+https://github.com/SachinSuresh010/unified-report-generator.git
-```
-
-### From Local Package
-
-```bash
-cd packages/unified-report-generator
-npm install
-npm link  # Optional: link for global usage
-```
-
 ## Getting Started
 
 Follow these steps to get started with Unified Report Generator:
@@ -411,10 +397,12 @@ npx unified-report
 
 ## Development
 
+For contributors and developers working on the package itself:
+
 ### Project Structure
 
 ```
-packages/unified-report-generator/
+unified-report-generator/
 ├── bin/
 │   └── cli.js                 # CLI entry point
 ├── src/
@@ -430,18 +418,7 @@ packages/unified-report-generator/
 └── README.md
 ```
 
-### Building
-
-```bash
-npm install
-```
-
-### Testing
-
-```bash
-# Test with sample data
-unified-report --config config.example.js
-```
+See the [GitHub repository](https://github.com/SachinSuresh010/unified-report-generator) for development setup instructions.
 
 ## License
 
